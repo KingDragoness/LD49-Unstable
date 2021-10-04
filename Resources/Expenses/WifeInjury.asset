@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: WifeInjury
   m_EditorClassIdentifier: 
   expenseName: Wife injured
-  expenseTotal: 100000
+  expenseTotal: 30000
   chanceToGet: 0.1

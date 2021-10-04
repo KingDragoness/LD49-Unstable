@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.EventSystems;
 
 namespace BaksoGame
 {
@@ -29,6 +30,7 @@ namespace BaksoGame
         public float hitpointGerobak = 100;
         public bool isDayStarted = false;
         public Customer currentCustomerSelected;
+        public Customer lastCustomerOrder;
 
         public static ConsoleBaksoMain Instance;
 
@@ -40,6 +42,8 @@ namespace BaksoGame
 
         public bool IsServingMode { get => isServingMode; }
         public bool IsDead { get => isDead; set => isDead = value; }
+
+        int UILayer;
 
         private void OnDrawGizmos()
         {
@@ -54,6 +58,7 @@ namespace BaksoGame
 
         void Start()
         {
+            UILayer = LayerMask.NameToLayer("UI");
             foreach (var ingredient in allIngredients)
             {
                 int amount = 50;
@@ -113,6 +118,7 @@ namespace BaksoGame
             PremanSpawner.Instance.ClearAll();
             NPCSpawner.instance.SpawnNewLevel();
             Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
             isServingMode = false;
             RefreshMode();
         }
@@ -155,11 +161,18 @@ namespace BaksoGame
 
         public void EndDay()
         {
+
+            if (hitpointGerobak < 30)
+            {
+                todayExpenses.Add("Hospital");
+            }
+
             foreach(var expense in todayExpenses)
             {
                 totalMoney -= GetExpense(expense).expenseTotal;
 
             }
+
             isDayStarted = false;
             Cursor.lockState = CursorLockMode.None;
             BaksoMainUI.instance.OpenReportSession();
@@ -182,7 +195,12 @@ namespace BaksoGame
             if (Input.GetMouseButtonUp(0))
             {
                 if (currentCustomerSelected != null)
+                {
+                    lastCustomerOrder = currentCustomerSelected;
+                    lastCustomerOrder.StartTimer();
                     HighlightOrder();
+
+                }
 
             }
 
@@ -214,6 +232,9 @@ namespace BaksoGame
 
             BaksoMainUI.instance.failSFX.Play();
             BaksoMainUI.instance.gameoverScreen.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
             isDead = true;
         }
 
@@ -221,6 +242,11 @@ namespace BaksoGame
 
         private void RaycastCustomers()
         {
+            if (IsPointerOverUIElement())
+            {
+                return;
+            }
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             bool noCustomerDetected = true;
@@ -287,6 +313,8 @@ namespace BaksoGame
             if (isServingMode)
             {
                 Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+
                 orderanUI.gameObject.SetActive(true);
                 virtualCam.gameObject.SetActive(false);
 
@@ -294,11 +322,43 @@ namespace BaksoGame
             else
             {
                 Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+
                 orderanUI.gameObject.SetActive(false);
                 virtualCam.gameObject.SetActive(true);
 
 
             }
         }
+
+        //Returns 'true' if we touched or hovering on Unity UI element.
+        public bool IsPointerOverUIElement()
+        {
+            return IsPointerOverUIElement(GetEventSystemRaycastResults());
+        }
+
+        //Returns 'true' if we touched or hovering on Unity UI element.
+        private bool IsPointerOverUIElement(List<RaycastResult> eventSystemRaysastResults)
+        {
+            for (int index = 0; index < eventSystemRaysastResults.Count; index++)
+            {
+                RaycastResult curRaysastResult = eventSystemRaysastResults[index];
+                if (curRaysastResult.gameObject.layer == UILayer)
+                    return true;
+            }
+            return false;
+        }
+
+
+        //Gets all event system raycast results of current mouse or touch position.
+        static List<RaycastResult> GetEventSystemRaycastResults()
+        {
+            PointerEventData eventData = new PointerEventData(EventSystem.current);
+            eventData.position = Input.mousePosition;
+            List<RaycastResult> raysastResults = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, raysastResults);
+            return raysastResults;
+        }
+
     }
 }

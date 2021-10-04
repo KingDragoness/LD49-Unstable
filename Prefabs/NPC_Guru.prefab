@@ -398,6 +398,8 @@ MonoBehaviour:
   selectedHighlight: {fileID: 6912277053113115887}
   needsIngredients: []
   hasBeenServed: 0
+  timerPatient: {x: 21, y: 26}
+  rewardBase: 30000
   reaction_Neutral: {fileID: 1831869887076533791}
   reaction_Good: {fileID: 2074235096991667481}
   reaction_Bad: {fileID: 3448992429777390511}

@@ -61,6 +61,7 @@ namespace BaksoGame
             }
             if (rb.velocity.magnitude > hitThreshold)
             {
+                BaksoMainUI.instance.crashSFX.Play();
                 ConsoleBaksoMain.Instance.DamagePlayer(10);
             }
         }
@@ -92,6 +93,7 @@ namespace BaksoGame
             {
                 if (CheckUpside() == false)
                 {
+                    BaksoMainUI.instance.boneBreakingSFX.Play();
                     ConsoleBaksoMain.Instance.DamagePlayer(7);
                 }
 
@@ -180,6 +182,9 @@ namespace BaksoGame
             vehicleEuler.x = 0;
             vehicleEuler.z = 0;
             transform.localEulerAngles = vehicleEuler;
+            rb.angularVelocity = rb.angularVelocity/1.5f;
+            rb.velocity = rb.velocity/2;
+
         }
     }
 }

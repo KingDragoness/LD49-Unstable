@@ -13,13 +13,23 @@ namespace BaksoGame
         public GameObject selectedHighlight;
         public List<IngredientForm> needsIngredients = new List<IngredientForm>();
         public bool hasBeenServed = false;
+        public Vector2 timerPatient = new Vector2(15,30);
+
+        [Space]
+        public int rewardBase = 40000;
+        public bool isPissedOff = false;
 
         [Space]
         public GameObject reaction_Neutral;
         public GameObject reaction_Good;
         public GameObject reaction_Bad;
 
-        private float timer = 0.2f;
+        private float highlightTimer = 0.2f;
+        private float timerGame = 30f;
+        private bool startOrder = false;
+
+        public float TimerGame { get => timerGame; set => timerGame = value; }
+        public bool HasStartedOrder { get => startOrder;  }
 
         private void Start()
         {
@@ -79,17 +89,19 @@ namespace BaksoGame
             if (mistakes <= 0)
             {
                 reaction_Good.gameObject.SetActive(true);
-                moneyEarned = 35000;
+                moneyEarned = rewardBase;
             }
             else if (mistakes >= 1 && mistakes <= 2)
             {
                 reaction_Neutral.gameObject.SetActive(true);
-                moneyEarned = 15000;
+                moneyEarned = rewardBase / 2;
             }
             else if (mistakes >= 3)
             {
                 reaction_Bad.gameObject.SetActive(true);
-                moneyEarned = 5000;
+                moneyEarned = rewardBase / 5;
+                isPissedOff = true;
+
             }
 
             ConsoleBaksoMain.Instance.todayMoneyEarned += moneyEarned;
@@ -106,19 +118,45 @@ namespace BaksoGame
         public void SelectHighlight()
         {
             selectedHighlight.SetActive(true);
-            timer = 0.2f;
+            highlightTimer = 0.2f;
+        }
+
+        public void StartTimer()
+        {
+
+            if (startOrder == false)
+                TimerGame = Random.Range(timerPatient.x, timerPatient.y);
+
+            startOrder = true;
+
         }
 
         private void Update()
         {
 
-            if (timer > 0)
+            if (highlightTimer > 0)
             {
-                timer -= Time.deltaTime;
+                highlightTimer -= Time.deltaTime;
             }
             else
             {
                 selectedHighlight.SetActive(false);
+            }
+
+            if (startOrder && hasBeenServed == false)
+            {
+                if (TimerGame > 0)
+                {
+                    TimerGame -= Time.deltaTime;
+                }
+                else
+                {
+                    hasBeenServed = true;
+                    selectedHighlight.SetActive(false);
+                    reaction_Bad.gameObject.SetActive(true);
+                    orderExclamation.SetActive(false);
+                    isPissedOff = true;
+                }
             }
         }
     }

@@ -37,6 +37,10 @@ namespace BaksoGame
         public AudioSource failSFX;
         public AudioSource victorySFX;
         public AudioSource tingtingSFX;
+        public AudioSource cookingSFX;
+        public AudioSource crashSFX;
+        public AudioSource boneBreakingSFX;
+        public AudioSource heresYourBaksoSFX;
 
         public static BaksoMainUI instance;
 
@@ -164,6 +168,11 @@ namespace BaksoGame
         {
             canvas_1.gameObject.SetActive(true);
             canvas_2.gameObject.SetActive(false);
+        }
+
+        public void Restart()
+        {
+            Application.LoadLevel(1);
         }
     }
 }

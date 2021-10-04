@@ -131,6 +131,7 @@ namespace BaksoGame
             }
 
             ConsoleBaksoMain.Instance.RemoveIngredientLeft(ID);
+            BaksoMainUI.instance.cookingSFX.Play();
             RefreshAllButtons();
 
         }
@@ -152,6 +153,7 @@ namespace BaksoGame
 
             customer.FoodServed(bowlButton.bowl);
             allBowlCooked.Remove(bowlButton.bowl);
+            BaksoMainUI.instance.heresYourBaksoSFX.Play();
             RefreshAllBowl();
         }
 
